@@ -65,6 +65,32 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script>
+        fetch('http://localhost:3000/cars')
+            .then(res => res.json())
+            .then(cars => {
+                const container = document.getElementById('car-container'); // Make sure this exists in your HTML
+
+                cars.forEach(car => {
+                    const card = document.createElement('div');
+                    card.className = 'col-4 md-3';
+                    card.innerHTML = `
+                <div class='card'>
+                    <div class='card-img-top'>
+                        <img src='images/${car.image}' alt='${car.name}' class='img-fluid'>
+                    </div>
+                    <div class='card-body'>
+                        <h5 class='card-title'>${car.name}</h5>
+                        <p class='card-text'>${car.description}</p>
+                    </div>
+                </div>
+            `;
+                    container.appendChild(card);
+                });
+            })
+            .catch(error => console.error('Error fetching cars:', error));
+
+    </script>
 </body>
 
 </html>

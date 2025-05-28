@@ -1,10 +1,32 @@
 const express = require('express');
 const path = require('path');
-const { users, cars } = require('./data/data.js'); 
+const multer = require('multer');
+const cors = require('cors');
+const { users, cars } = require('./data/data.js');
 const app = express();
-
-app.use(express.json()); 
+app.use(cors());
+app.use(express.json());
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
+
+app.use('/public/images', express.static('public/images'));
+
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'images/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+
+
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // Limite: 2MB
+});
 
 // USERS CRUD 
 
@@ -32,7 +54,7 @@ app.get('/users/:id', (req, res) => {
 // UPDATE user
 app.put('/users/:id', (req, res) => {
     const index = users.findIndex(u => u.id === parseInt(req.params.id));
-     // Error
+    // Error
     if (index === -1) return res.status(404).json({ error: 'Utilisateur non trouvé.' });
     users[index] = { ...users[index], ...req.body };
     res.json(users[index]);
@@ -41,7 +63,7 @@ app.put('/users/:id', (req, res) => {
 // DELETE user
 app.delete('/users/:id', (req, res) => {
     const index = users.findIndex(u => u.id === parseInt(req.params.id));
-     // Error
+    // Error
     if (index === -1) return res.status(404).json({ error: 'Utilisateur non trouvé.' });
     const deleted = users.splice(index, 1);
     res.json(deleted[0]);
@@ -50,12 +72,23 @@ app.delete('/users/:id', (req, res) => {
 //  CARS CRUD 
 
 // CREATE car
-app.post('/cars', (req, res) => {
-    const newCar = req.body;
-    newCar.id = cars.length ? cars[cars.length - 1].id + 1 : 1;
+
+app.post('/cars', upload.single('image'), (req, res) => {
+    const { matricule, mark, sere } = req.body;
+    const image = req.file;
+
+    const newCar = {
+        id: Date.now().toString(),
+        matricule,
+        mark,
+        sere,
+        image
+    };
+
     cars.push(newCar);
     res.status(201).json(newCar);
 });
+
 
 // READ all cars
 app.get('/cars', (req, res) => {
