@@ -35,7 +35,7 @@ const cars = [
         matricule: "AA-123-AA",
         mark: "Peugeot",
         sere: "208",
-        image: "Renault-clio.ipg",
+        image: "Peugeot-208.jpg",
     },
     {
         id: 2,

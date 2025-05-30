@@ -10,10 +10,17 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 app.use('/public/images', express.static('public/images'));
 
+// Pour servir clients.html
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+});
+
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'images/');
+        cb(null, 'public/images/');
     },
     filename: function (req, file, cb) {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -41,6 +48,18 @@ app.post('/users', (req, res) => {
 // READ all users
 app.get('/users', (req, res) => {
     res.json(users);
+});
+app.post('/api/users', (req, res) => {
+    const { nom, prenom, email, telephone } = req.body;
+    const newUser = {
+        id: users.length + 1,
+        nom,
+        prenom,
+        email,
+        telephone
+    };
+    users.push(newUser);
+    res.status(201).json(newUser);
 });
 
 // READ one user

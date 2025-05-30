@@ -30,6 +30,58 @@
             </div>
         </div>
     </nav>
+    <!--aficher les clients-->
+    
+    <!--ajouter client-->
+    <div class="bg-light">
+        <div class="container py-5">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="mb-0">Liste des Clients</h1>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">+ Ajouter</button>
+            </div>
+
+            <div class="row" id="cardContainer">
+                <!-- Les cartes seront injectées ici -->
+            </div>
+        </div>
+
+        <!-- 💬 Modal pour ajouter un utilisateur -->
+        <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <form id="addUserForm" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addUserModalLabel">Ajouter un utilisateur</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Prénom</label>
+                            <input type="text" name="prenom" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Nom</label>
+                            <input type="text" name="nom" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Email</label>
+                            <input type="email" name="email" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Téléphone</label>
+                            <input type="text" name="telephone" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Ajouter</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
     <!--footer-->
     <footer class="bg-dark text-white mt-5">
         <div class="container py-4">
@@ -65,6 +117,60 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
+    <script>
+        const container = document.getElementById('cardContainer');
+
+        function afficherUsers(users) {
+            container.innerHTML = ''; // Vider avant de remplir
+            users.forEach(user => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4 mb-4';
+                col.innerHTML = `
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">${user.prenom} ${user.nom}</h5>
+                            <p class="card-text"><strong>Email :</strong> ${user.email}</p>
+                            <p class="card-text"><strong>Téléphone :</strong> ${user.telephone}</p>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(col);
+            });
+        }
+
+        // Charger les utilisateurs
+        function chargerUsers() {
+            fetch('/users')
+                .then(res => res.json())
+                .then(afficherUsers)
+                .catch(console.error);
+        }
+
+        chargerUsers();
+
+        // Gestion du formulaire
+        document.getElementById('addUserForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
+                    modal.hide();
+                    this.reset();
+                    chargerUsers();
+                })
+                .catch(console.error);
+        });
+    </script>
+
 </body>
 
 </html>

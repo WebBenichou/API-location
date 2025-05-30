@@ -30,6 +30,9 @@
             </div>
         </div>
     </nav>
+    <div class="row" id="car-container">
+
+    </div>
     <!--footer-->
     <footer class="bg-dark text-white mt-5">
         <div class="container py-4">
@@ -69,7 +72,7 @@
         fetch('http://localhost:3000/cars')
             .then(res => res.json())
             .then(cars => {
-                const container = document.getElementById('car-container'); // Make sure this exists in your HTML
+                const container = document.getElementById('car-container');
 
                 cars.forEach(car => {
                     const card = document.createElement('div');
@@ -77,11 +80,11 @@
                     card.innerHTML = `
                 <div class='card'>
                     <div class='card-img-top'>
-                        <img src='images/${car.image}' alt='${car.name}' class='img-fluid'>
+                        <img src='images/${car.image}' class='img-fluid'>
                     </div>
                     <div class='card-body'>
-                        <h5 class='card-title'>${car.name}</h5>
-                        <p class='card-text'>${car.description}</p>
+                        <h5 class='card-title'>${car.mark}</h5>
+                        <p class='card-text'>${car.matricule}</p>
                     </div>
                 </div>
             `;
